@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jogo do Violino - Pixel Art</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Courier New', monospace; background: linear-gradient(135deg, #1a1a2e, #16213e); overflow: hidden; touch-action: manipulation; user-select: none; }
+    .game-container { width:100vw; height:100vh; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .stage-background { position:absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, #2c1810, #1a0f08); z-index:1; }
+    .stage-lights { position:absolute; top:0; left:0; width:100%; height:100%; background: radial-gradient(ellipse at center top, rgba(255,255,200,0.3) 0%, transparent 50%); z-index:2; }
+    .title { position:absolute; top:20px; left:50%; transform:translateX(-50%); color:#fff; font-size:clamp(16px,4vw,24px); text-align:center; text-shadow:2px 2px 4px rgba(0,0,0,0.8); z-index:10; padding:10px 20px; background:rgba(0,0,0,0.5); border-radius:10px; border:2px solid #ffd700; }
+    .girl-container { position:absolute; bottom:15%; left:50%; transform:translateX(-50%); z-index:5; }
+    .girl-sprite { width:clamp(120px,25vw,200px); height:auto; image-rendering:pixelated; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
+    .violin-container { position:absolute; bottom:25%; right:20%; z-index:6; }
+    .violin { width:clamp(80px,15vw,120px); height:clamp(120px,22vw,180px); background:linear-gradient(45deg,#8B4513,#A0522D); border-radius:50px 50px 20px 20px; position:relative; border:3px solid #654321; box-shadow:0 5px 15px rgba(0,0,0,0.3); }
+    .violin-strings { position:absolute; top:10%; left:50%; transform:translateX(-50%); width:20px; height:80%; display:flex; flex-direction:column; justify-content:space-between; z-index:10; }
+    .string { width:100%; height:4px; background:#c0c0c0; cursor:pointer; transition:all 0.1s ease; position:relative; margin:3px 0; border-radius:2px; box-shadow:0 1px 3px rgba(0,0,0,0.3); }
+    .string:hover { background:#ffd700; box-shadow:0 0 10px #ffd700; }
+    .string:active { background:#ff6b6b; transform:scaleY(1.5); }
+    .string-labels { position:absolute; right:-40px; top:0; height:100%; display:flex; flex-direction:column; justify-content:space-between; align-items:flex-start; pointer-events:none; z-index:12; }
+    .string-label { color:#fff; font-size:clamp(10px,2.5vw,14px); font-weight:bold; text-shadow:1px 1px 2px rgba(0,0,0,0.8); background:rgba(0,0,0,0.6); padding:2px 6px; border-radius:4px; border:1px solid #ffd700; }
+    .note-animation { position:absolute; color:#ffd700; font-size:20px; font-weight:bold; pointer-events:none; animation:noteFloat 1s ease-out forwards; text-shadow:2px 2px 4px rgba(0,0,0,0.8); transform:translateX(-50%); }
+    @keyframes noteFloat { 0% { opacity:1; transform: translateY(0) scale(1); } 100% { opacity:0; transform: translateY(-50px) scale(1.5); } }
+    .paper-note { position:absolute; bottom:10%; left:30%; width:clamp(40px,8vw,60px); height:clamp(30px,6vw,45px); background:#f5f5dc; border:2px solid #ddd; border-radius:5px; cursor:pointer; transform:rotate(-15deg); transition:all 0.3s ease; z-index:7; display:none; box-shadow:0 3px 10px rgba(0,0,0,0.3); }
+    .paper-note:hover { transform:rotate(-10deg) scale(1.1); box-shadow:0 5px 15px rgba(0,0,0,0.5); }
+    .paper-note::before { content:'💌'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:clamp(16px,3vw,24px); }
+    .paper-message { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.9); color:#fff; padding:20px; border-radius:10px; text-align:center; font-size:clamp(12px,3vw,16px); z-index:15; display:none; border:2px solid #ffd700; max-width:90%; }
+    .applause-indicator { position:absolute; top:50%; left:10%; color:#ffd700; font-size:clamp(14px,3vw,18px); font-weight:bold; opacity:0; transition:opacity 0.3s ease; text-shadow:2px 2px 4px rgba(0,0,0,0.8); z-index:8; }
+    .applause-indicator.show { opacity:1; }
+    .sparkle { position:absolute; color:#ffd700; font-size:16px; pointer-events:none; animation:sparkle 1.5s ease-out forwards; }
+    @keyframes sparkle { 0% { opacity:1; transform:scale(0) rotate(0deg); } 50% { opacity:1; transform:scale(1) rotate(180deg); } 100% { opacity:0; transform:scale(0) rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <div class="stage-background"></div>
+    <div class="stage-lights"></div>
+
+    <div class="title">Toque os acordes apertando no violino e faça um show!</div>
+
+    <div class="girl-container">
+      <img src="girl_with_violin.png" alt="Garotinha com violino" class="girl-sprite">
+    </div>
+
+    <div class="violin-container">
+      <div class="violin">
+        <div class="violin-strings">
+          <div class="string" data-note="DO" data-sound="DO.mp3"></div>
+          <div class="string" data-note="RE" data-sound="RE.mp3"></div>
+          <div class="string" data-note="MI" data-sound="MI.mp3"></div>
+          <div class="string" data-note="FA" data-sound="FA.mp3"></div>
+          <div class="string" data-note="SOL" data-sound="SOL.mp3"></div>
+          <div class="string" data-note="LA" data-sound="LA.mp3"></div>
+          <div class="string" data-note="SI" data-sound="SI.mp3"></div>
+        </div>
+
+        <div class="string-labels">
+          <div class="string-label">DO</div>
+          <div class="string-label">RE</div>
+          <div class="string-label">MI</div>
+          <div class="string-label">FA</div>
+          <div class="string-label">SOL</div>
+          <div class="string-label">LA</div>
+          <div class="string-label">SI</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="paper-note" id="paperNote"></div>
+    <div class="paper-message" id="paperMessage">* Um fã te jogou um papelzinho. Pegue. *</div>
+    <div class="applause-indicator" id="applauseIndicator">👏 Palmas! 👏</div>
+  </div>
+
+  <script>
+    class ViolinGame {
+      constructor() {
+        this.notesPlayed = 0;
+        this.applauseAudio = new Audio('applause.mp3'); // pode ser .wav também
+        this.noteAudios = {};
+        this.applauseThreshold = 3;
+        this.applausePlayed = false;
+
+        this.initAudio();
+        this.initEventListeners();
+      }
+
+      initAudio() {
+        this.applauseAudio.volume = 0.7;
+
+        // mapeia DO->C, RE->D, etc.
+        const noteMap = {
+          'DO': ['DO.mp3','C.mp3'],
+          'RE': ['RE.mp3','D.mp3'],
+          'MI': ['MI.mp3','E.mp3'],
+          'FA': ['FA.mp3','F.mp3'],
+          'SOL': ['SOL.mp3','G.mp3'],
+          'LA': ['LA.mp3','A.mp3'],
+          'SI': ['SI.mp3','B.mp3'],
+        };
+
+        for (const [note, files] of Object.entries(noteMap)) {
+          // pega o primeiro que existir
+          this.noteAudios[note] = new Audio(files[0]);
+          this.noteAudios[note].volume = 0.8;
+        }
+      }
+
+      initEventListeners() {
+        const strings = document.querySelectorAll('.string');
+        const paperNote = document.getElementById('paperNote');
+
+        strings.forEach(string => {
+          string.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.playNote(string);
+          });
+          string.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            this.playNote(string);
+          });
+        });
+
+        paperNote.addEventListener('click', () => this.openLetter());
+        paperNote.addEventListener('touchstart', (e) => { e.preventDefault(); this.openLetter(); });
+      }
+
+      playNote(stringElement) {
+        const note = stringElement.dataset.note;
+        if (this.noteAudios[note]) {
+          this.noteAudios[note].currentTime = 0;
+          this.noteAudios[note].play();
+        }
+
+        this.createNoteAnimation(stringElement, note);
+        this.createSparkleEffect(stringElement);
+
+        this.notesPlayed++;
+
+        if (this.notesPlayed >= this.applauseThreshold && !this.applausePlayed) {
+          setTimeout(() => { this.playApplause(); this.applausePlayed = true; }, 500);
+        }
+
+        if (this.notesPlayed >= 8) {
+          setTimeout(() => { this.showPaperNote(); }, 2000);
+        }
+      }
+
+      createNoteAnimation(stringElement, noteText) {
+        const noteElement = document.createElement('div');
+        noteElement.className = 'note-animation';
+        noteElement.textContent = noteText;
+        const rect = stringElement.getBoundingClientRect();
+        noteElement.style.left = (rect.left + rect.width / 2) + 'px';
+        noteElement.style.top = (rect.top - 10) + 'px';
+        noteElement.style.position = 'absolute';
+        document.body.appendChild(noteElement);
+        setTimeout(() => noteElement.remove(), 1000);
+      }
+
+      createSparkleEffect(stringElement) {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        sparkle.textContent = '✨';
+        const rect = stringElement.getBoundingClientRect();
+        sparkle.style.left = (rect.left + Math.random() * rect.width) + 'px';
+        sparkle.style.top = (rect.top + Math.random() * rect.height) + 'px';
+        sparkle.style.position = 'absolute';
+        document.body.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 1500);
+      }
+
+      playApplause() {
+        this.applauseAudio.currentTime = 0;
+        this.applauseAudio.play();
+        const indicator = document.getElementById('applauseIndicator');
+        indicator.classList.add('show');
+        setTimeout(() => indicator.classList.remove('show'), 2000);
+      }
+
+      showPaperNote() {
+        const paperNote = document.getElementById('paperNote');
+        const paperMessage = document.getElementById('paperMessage');
+        paperNote.style.display = 'block';
+        paperMessage.style.display = 'block';
+        setTimeout(() => { paperMessage.style.display = 'none'; }, 3000);
+      }
+
+      openLetter() { window.location.href = 'letter.html'; }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => new ViolinGame());
+  </script>
+</body>
+</html>
