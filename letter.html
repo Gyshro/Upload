@@ -1,280 +1,407 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Carta de Fã - Jogo do Violino</title>
-<style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Courier New',monospace;background:linear-gradient(135deg,#f5f5dc,#e6e6fa);height:100vh;display:flex;align-items:center;justify-content:center;touch-action:manipulation;user-select:none}
-  .letter-container{width:90vw;max-width:700px;height:85vh;background:#f9f9f9;border:3px solid #ddd;border-radius:15px;position:relative;box-shadow:0 10px 30px rgba(0,0,0,0.25);transform:rotate(-2deg);animation:paperFloat 3s ease-in-out infinite;overflow:hidden}
-  @keyframes paperFloat{0%,100%{transform:rotate(-2deg) translateY(0)}50%{transform:rotate(-1deg) translateY(-6px)}}
-  .paper-texture{position:absolute;inset:0;background:
-    radial-gradient(circle at 20% 30%, rgba(200,200,200,0.08) 1px, transparent 1px),
-    radial-gradient(circle at 80% 70%, rgba(200,200,200,0.06) 1px, transparent 1px),
-    radial-gradient(circle at 40% 80%, rgba(200,200,200,0.05) 1px, transparent 1px);border-radius:15px;pointer-events:none}
-  .kiss-mark{position:absolute;top:12%;right:8%;font-size:clamp(26px,5.5vw,48px);color:#ff69b4;transform:rotate(14deg);filter:drop-shadow(2px 2px 4px rgba(0,0,0,0.18))}
-  .main-text{position:absolute;top:18%;left:12%;right:12%;font-family:'Brush Script MT',cursive,'Courier New',monospace;font-size:clamp(18px,4vw,28px);color:#2c3e50;line-height:1.6;text-align:center;transform:rotate(1deg)}
-  .rose{position:absolute;bottom:16%;right:18%;font-size:clamp(24px,5vw,40px);transform:rotate(-10deg);filter:drop-shadow(2px 2px 4px rgba(0,0,0,0.18))}
-  .heart{position:absolute;bottom:20%;left:18%;font-size:clamp(18px,4vw,34px);color:#e74c3c;animation:heartbeat 2s ease-in-out infinite}
-  @keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-  .thought-bubble{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.96);border:2px solid #333;border-radius:20px;padding:14px 22px;font-size:clamp(14px,3vw,18px);color:#333;text-align:center;box-shadow:0 5px 15px rgba(0,0,0,0.12);z-index:10;max-width:80%}
-  .read-button{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);background:linear-gradient(45deg,#ff6b6b,#ee5a24);color:#fff;border:none;padding:14px 28px;font-size:clamp(15px,3.2vw,20px);font-weight:700;border-radius:24px;cursor:pointer;box-shadow:0 5px 15px rgba(0,0,0,0.2);z-index:10;display:none}
-  .read-button:active{transform:translateX(-50%) translateY(1px)}
-  .skip-button{position:absolute;bottom:10%;right:6%;background:rgba(0,0,0,0.6);color:#fff;border:none;padding:8px 12px;border-radius:12px;cursor:pointer;z-index:11;display:none}
-  .typing-text{display:none;position:absolute;top:12%;left:8%;right:8%;bottom:12%;overflow:auto;padding:18px;font-family:'Brush Script MT',cursive,'Courier New',monospace;font-size:clamp(16px,3.2vw,20px);color:#2c3e50;line-height:1.6;background:transparent;border-radius:8px}
-  .cursor{display:inline-block;background:#2c3e50;width:2px;animation:blink 1s infinite;margin-left:2px;vertical-align:text-bottom}
-  @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
-  .back-button{position:absolute;top:14px;left:14px;background:rgba(0,0,0,0.7);color:#fff;border:none;padding:10px 14px;border-radius:18px;cursor:pointer;z-index:15}
-  .crumpled-effect{position:absolute;inset:0;background:
-    radial-gradient(ellipse at 25% 25%, rgba(0,0,0,0.03) 0%, transparent 50%),
-    radial-gradient(ellipse at 75% 75%, rgba(0,0,0,0.03) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 10%, rgba(0,0,0,0.02) 0%, transparent 40%);pointer-events:none;border-radius:15px}
-  @media (max-width:768px){.main-text{left:10%;right:10%}.thought-bubble{max-width:90%;padding:12px 18px}.typing-text{top:10%;left:6%;right:6%;bottom:14%}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carta de Fã - Jogo do Violino</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5f5dc, #e6e6fa);
+            overflow: hidden;
+            touch-action: manipulation;
+            user-select: none;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .letter-container {
+            width: 90vw;
+            max-width: 600px;
+            height: 85vh;
+            background: #f9f9f9;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: rotate(-2deg);
+            animation: paperFloat 3s ease-in-out infinite;
+            overflow-y: auto;
+        }
+
+        @keyframes paperFloat {
+            0%, 100% { transform: rotate(-2deg) translateY(0px); }
+            50% { transform: rotate(-1deg) translateY(-5px); }
+        }
+
+        .paper-texture {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(200,200,200,0.1) 1px, transparent 1px),
+                radial-gradient(circle at 80% 70%, rgba(200,200,200,0.1) 1px, transparent 1px),
+                radial-gradient(circle at 40% 80%, rgba(200,200,200,0.1) 1px, transparent 1px);
+            border-radius: 15px;
+        }
+
+        .kiss-mark {
+            position: absolute;
+            top: 15%;
+            right: 10%;
+            font-size: clamp(30px, 6vw, 50px);
+            color: #ff69b4;
+            transform: rotate(15deg);
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .main-text {
+            position: absolute;
+            top: 20%;
+            left: 15%;
+            right: 15%;
+            font-family: 'Arial', sans-serif;
+            font-size: clamp(20px, 4.5vw, 30px) !important;
+            font-weight: bold;
+            color: #000000;
+            line-height: 1.6;
+            text-align: center;
+            transform: rotate(1deg);
+        }
+
+        .rose {
+            position: absolute;
+            bottom: 15%;
+            right: 20%;
+            font-size: clamp(25px, 5vw, 40px);
+            transform: rotate(-10deg);
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .heart {
+            position: absolute;
+            bottom: 20%;
+            left: 20%;
+            font-size: clamp(20px, 4vw, 35px);
+            color: #e74c3c;
+            animation: heartbeat 2s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .thought-bubble {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.95);
+            border: 2px solid #333;
+            border-radius: 20px;
+            padding: 15px 25px;
+            font-size: clamp(14px, 3vw, 18px);
+            color: #333;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 10;
+            max-width: 80%;
+        }
+
+        .thought-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 30px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid #333;
+        }
+
+        .thought-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 32px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid rgba(255,255,255,0.95);
+        }
+
+        .read-button {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: clamp(16px, 3.5vw, 20px);
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            z-index: 10;
+            display: none;
+        }
+
+        .read-button:hover {
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.4);
+        }
+
+        .read-button:active {
+            transform: translateX(-50%) translateY(0px);
+        }
+
+        .typing-text {
+            display: none;
+            position: absolute;
+            top: 10%;
+            left: 8%;
+            right: 8%;
+            bottom: 10%;
+            font-family: 'Arial', sans-serif;
+            font-size: clamp(16px, 3vw, 20px) !important;
+            font-weight: normal;
+            color: #000000;
+            line-height: 1.5;
+            text-align: left;
+            overflow-y: auto;
+            padding: 10px;
+            z-index: 5;
+        }
+
+        .cursor {
+            display: inline-block;
+            background-color: #2c3e50;
+            width: 2px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: clamp(12px, 2.5vw, 16px);
+            border-radius: 20px;
+            cursor: pointer;
+            z-index: 15;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(0,0,0,0.9);
+            transform: translateY(-2px);
+        }
+
+        .crumpled-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 25% 25%, rgba(0,0,0,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 75% 75%, rgba(0,0,0,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 10%, rgba(0,0,0,0.03) 0%, transparent 40%);
+            border-radius: 15px;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .letter-container {
+                width: 95vw;
+                height: 90vh;
+            }
+            
+            .main-text {
+                left: 10%;
+                right: 10%;
+            }
+            
+            .thought-bubble {
+                max-width: 90%;
+                padding: 12px 20px;
+            }
+
+            .typing-text {
+                left: 5%;
+                right: 5%;
+                font-size: clamp(14px, 2.5vw, 18px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .kiss-mark {
+                top: 10%;
+                right: 5%;
+            }
+            
+            .rose {
+                bottom: 10%;
+                right: 15%;
+            }
+            
+            .heart {
+                bottom: 15%;
+                left: 15%;
+            }
+        }
+    </style>
 </head>
 <body>
-  <button class="back-button" onclick="goBack()">← Voltar</button>
+    <button class="back-button" onclick="goBack()">← Voltar</button>
+    
+    <div class="letter-container">
+        <div class="paper-texture"></div>
+        <div class="crumpled-effect"></div>
+        
+        <div class="kiss-mark">💋</div>
+        
+        <div class="main-text" id="mainText">
+            Você é uma inspiração!! Sou seu fã
+        </div>
+        
+        <div class="rose">🌹</div>
+        <div class="heart">❤️</div>
+        
+        <div class="thought-bubble" id="thoughtBubble">
+            Ué, um bilhete? Isso aqui não é um papel de catarro não, né?
+        </div>
+        
+        <button class="read-button" id="readButton" onclick="startReading()">
+            Ler
+        </button>
+        
+        <div class="typing-text" id="typingText"></div>
+    </div>
 
-  <div class="letter-container" id="letterContainer">
-    <div class="paper-texture"></div>
-    <div class="crumpled-effect"></div>
+    <script>
+        // Variáveis globais
+        let musicAudio = new Audio('SpotiDown.App-Youth-Daughter.mp3');
+        let musicDuration = 180; // 3 minutos em segundos
+        let letterText = `Outro dia, ouvi uma pessoa respirar fundo antes de dizer: "Desculpa. Acho que sinto demais. Eu estou exagerando, né?"
 
-    <div class="kiss-mark">💋</div>
+A forma como ela falava era quase um pedido de desculpas por existir do jeito que é. Mas então, tive que retrucar e dizer: Você é um violino.
 
-    <div class="main-text" id="mainText">Você é uma inspiração!! Sou seu fã</div>
-
-    <div class="rose">🌹</div>
-    <div class="heart">❤️</div>
-
-    <div class="thought-bubble" id="thoughtBubble">Ué, um bilhete? Isso aqui não é um papel de catarro não, né?</div>
-
-    <button class="read-button" id="readButton">Ler</button>
-    <button class="skip-button" id="skipButton">Pular</button>
-
-    <div class="typing-text" id="typingText" aria-live="polite"></div>
-  </div>
-
-<script>
-/*
-  letter.html — versão robusta
-  - tenta carregar romantic_music.mp3 -> fallback .wav -> sem música
-  - botão "Ler" dispara digitação sincronizada com a duração da música (quando disponível)
-  - botão "Pular" finaliza a digitação imediatamente
-  - evita tela branca mesmo se áudio falhar
-*/
-
-class LetterReader {
-  constructor(opts = {}) {
-    this.musicCandidates = opts.musicCandidates || ['romantic_music.mp3','romantic_music.wav','romantic_music.ogg'];
-    this.defaultMusicDuration = opts.defaultMusicDuration || 60; // segundos fallback
-    this.letterText = opts.letterText || `Querida violinista,
-
-Desde o primeiro momento em que ouvi você tocar, meu coração se encheu de uma melodia que nunca havia sentido antes. Suas notas dançam no ar como borboletas douradas, tocando minha alma de uma forma que as palavras não conseguem expressar.
-
-Você não é apenas uma musicista, você é uma artista que transforma sons em emoções, que faz o impossível parecer simples e natural. Cada acorde que você toca ressoa dentro de mim como um eco de algo divino.
-
-Sua paixão pela música é contagiante, sua dedicação é inspiradora, e seu talento é simplesmente extraordinário. Você me ensinou que a música não é apenas som, mas sim a linguagem universal do coração.
-
-Obrigado por existir, por compartilhar seu dom conosco, e por fazer deste mundo um lugar mais belo e harmonioso. Você é verdadeiramente especial, e espero que continue tocando e encantando corações por toda a vida.
-
-Com admiração e carinho infinitos,
-Seu fã mais dedicado 💕
-
-P.S.: Que sua música continue sendo a trilha sonora dos sonhos de muitas pessoas, assim como é da minha.`;
-
-    // elementos
-    this.readButton = document.getElementById('readButton');
-    this.skipButton = document.getElementById('skipButton');
-    this.thoughtBubble = document.getElementById('thoughtBubble');
-    this.mainText = document.getElementById('mainText');
-    this.typingArea = document.getElementById('typingText');
-
-    // state
-    this.musicAudio = null;
-    this.musicDuration = null;
-    this.typingInterval = null;
-    this.isTyping = false;
-    this.isMusicLoaded = false;
-    this.index = 0;
-
-    this.setup();
-  }
-
-  setup() {
-    // tentar carregar primeiro candidate existente
-    this.tryLoadMusicCandidates().finally(() => {
-      // mostrar botão "Ler" após pequena espera (estética)
-      setTimeout(() => {
-        this.thoughtBubble.style.display = 'none';
-        this.readButton.style.display = 'block';
-        this.skipButton.style.display = 'none';
-      }, 1000);
-    });
-
-    // ligar eventos
-    this.readButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      this.startReading();
-    });
-
-    this.skipButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      this.finishTypingImmediately();
-    });
-
-    // permitir clique na typingArea pra pular também
-    this.typingArea.addEventListener('click', () => {
-      if (this.isTyping) this.finishTypingImmediately();
-    });
-  }
-
-  async tryLoadMusicCandidates() {
-    for (const candidate of this.musicCandidates) {
-      try {
-        const audio = new Audio();
-        audio.src = candidate;
-        // start loading metadata
-        await new Promise((resolve, reject) => {
-          const onLoaded = () => { resolve(true); };
-          const onError = () => { resolve(false); }; // resolve false para tentar próximo
-          // loadedmetadata normalmente indica duration known
-          audio.addEventListener('loadedmetadata', onLoaded, { once: true });
-          audio.addEventListener('error', onError, { once: true });
-          // force load
-          try { audio.load(); } catch(e) { /* ignore */ }
-          // também timeout fallback
-          setTimeout(() => resolve(false), 1200);
-        }).then((ok) => {
-          if (ok && !isNaN(audio.duration) && audio.duration > 0) {
-            this.musicAudio = audio;
-            this.musicDuration = audio.duration;
-            this.isMusicLoaded = true;
-          }
-        });
-        if (this.isMusicLoaded) break;
-      } catch (err) {
-        // continue to next candidate
-        console.warn('Erro carregando áudio candidato', candidate, err);
-      }
-    }
-
-    if (!this.isMusicLoaded) {
-      // fallback: cria um audio vazio apenas para evitar código quebrar
-      try {
-        this.musicAudio = new Audio();
-      } catch(e) { this.musicAudio = null; }
-      this.musicDuration = this.defaultMusicDuration;
-    }
-  }
-
-  startReading() {
-    if (this.isTyping) return; // evita clique duplo
-
-    // UI
-    this.readButton.style.display = 'none';
-    this.thoughtBubble.style.display = 'none';
-    this.mainText.style.display = 'none';
-    this.typingArea.style.display = 'block';
-    this.skipButton.style.display = 'block';
-    this.typingArea.innerHTML = '';
-    this.index = 0;
-
-    // calcular velocidade com base na duração (se souber), caso contrário fallback
-    const duration = (this.isMusicLoaded && !isNaN(this.musicDuration) && this.musicDuration > 0) ? this.musicDuration : this.defaultMusicDuration;
-
-    // ms por caractere (limitado)
-    const totalChars = Math.max(1, this.letterText.length);
-    let msPerChar = Math.round((duration * 1000) / totalChars);
-    msPerChar = Math.max(6, Math.min(160, msPerChar)); // limites mais razoáveis
-
-    // tentar tocar a música
-    if (this.musicAudio && typeof this.musicAudio.play === 'function') {
-      try {
-        this.musicAudio.currentTime = 0;
-        // tocar só após interação (tem clique)
-        const playPromise = this.musicAudio.play();
-        if (playPromise && playPromise.catch) {
-          playPromise.catch(e => console.warn('Reprodução bloqueada ou falhou:', e));
+Talvez ela tenha ficado com dúvidas, tipo agora levantando uma sobrancelha enquanto lê isso estando doente da forma como está, mas eu continuei: Entre todos os instrumentos, o violino é um dos mais sensíveis. Qualquer variação no ambiente, temperatura, umidade, o afeta. Mas, isso é ruim? Não. É exatamente essa sensibilidade que permite que ele produza os sons mais emocionantes e os maiores sonetos do mundo da música. Talvez ache que seja só um elogio de agrado, mas eu enfatizo mais: sabe o que acontece quando a gente tenta tornar um violino mais resistente? Eu respondo por você, ele quebra. Porque a força dele nunca esteve na dureza. Sempre esteve em sua resposta, na sua emoção, na vibração que ecoa. E não é uma fraqueza sentir muito e MUITO menos defeito. É uma característica e mais do que isso, uma afinação porque você não está errada por sentir. Você só precisa ser cuidada de forma adequada do jeito que merece, assim como um instrumento precioso, do jeito que você é. Com todo respeito, tempo e amor que você REALMENTE merece. Porque logo você, que sente muito, carrega esse dom de ouvir o que o mundo não pode escutar, os ecos mais raros que alguém pode emitir. E eu queria dizer que eu te amo, sibilado, lento como se tivesse saboreando um sorvete de creme de pistache. Eu quero falar pro mundo a sensação que é, imaginar o seu cheiro, de tudo que aprendi com você e talvez o mundo risse de mim, lógico. Faz pouco tempo que eu cheguei em relação ao tempo e já pensei sobre isso tudo quando você nem sabia meu nome direito e mesmo assim, minha maior vontade é de grudar sua foto em todos os lambe lambe da cidade. Encontrar com alguém no bar totalmente afogado por bebida e dizer que acabaram as desesperanças, o amor realmente existe eu vi e presenciei nos meus próprios olhos, eu senti mesmo de longe, com a boca do estômago. E se for pra julgamento pode me colocar como testemunha, se o processo for comigo que se lasque, eu nem me encontro com advogado porque eu tô certo, tô certo que te amo. Uma certeza nunca antes vista, como uma nota imprevista por Niccolò Paganini em seu auge como violinista, e nenhuma incerteza me inibe disso. Uma certeza nunca antes vista assim como 2+2 é igual a 4,5. ( ? ) Eu me sinto tão certo, que eu acredito que seja eu ao descrever o desespero de romeu pois impossível alguém ter sentido um sentimento tão parecido, sabe? Se eu fosse recolher todas as flores que eu gostaria de te dar, eu seria responsável por aumentar consideravelmente o aquecimento global. E eu queria te dizer que eu te amo... T E A M O. T e a m o. Realmente, soa tal como um creme básico, uma marca até. Eu na verdade quero que se sinta amada, num ponto que nem você possa amar de volta, como se tivesse caindo de câmera lenta, como se um acorde do seu violino tivesse rompido impedido disso de acontecer. Eu queria te dizer que te amo, sibilado, mas eu sendo como sou e amando como eu amo, sei que é quase impossível descrever da forma como você merece. E bom? Isso tem gosto de tudo, menos do gosto do sorvete que descrevi, pois é indescritível.`;
+        
+        // Configurar áudio
+        musicAudio.volume = 0.6;
+        musicAudio.loop = false;
+        
+        // Função para iniciar a leitura
+        function startReading() {
+            console.log('Botão Ler clicado!');
+            
+            // Esconder elementos iniciais
+            document.getElementById('thoughtBubble').style.display = 'none';
+            document.getElementById('readButton').style.display = 'none';
+            document.getElementById('mainText').style.display = 'none';
+            
+            // Mostrar área de digitação
+            const typingArea = document.getElementById('typingText');
+            typingArea.style.display = 'block';
+            
+            // Iniciar música
+            musicAudio.play().catch(e => {
+                console.error('Erro ao tocar música:', e);
+                alert('A música não pôde ser reproduzida automaticamente. Clique em OK para continuar.');
+                musicAudio.play().catch(e => console.error('Erro ao tocar música após interação:', e));
+            });
+            
+            // Iniciar efeito de digitação
+            typeText();
         }
-      } catch (e) {
-        console.warn('Erro ao iniciar áudio:', e);
-      }
-    }
+        
+        // Função para o efeito de digitação
+        function typeText() {
+            const typingArea = document.getElementById('typingText');
+            const text = letterText;
+            let index = 0;
+            
+            const totalChars = text.length;
+            const typingSpeed = (musicDuration * 1000) / totalChars;
+            
+            const typeInterval = setInterval(() => {
+                if (index < text.length) {
+                    const currentChar = text[index];
+                    
+                    const currentContent = typingArea.innerHTML;
+                    const cursorSpan = '<span class="cursor">|</span>';
+                    const cursorIndex = currentContent.lastIndexOf(cursorSpan);
+                    if (cursorIndex !== -1) {
+                        typingArea.innerHTML = currentContent.substring(0, cursorIndex);
+                    }
 
-    // iniciar digitação
-    this.isTyping = true;
-    this.typeText(msPerChar);
-  }
-
-  typeText(msPerChar) {
-    const text = this.letterText;
-    this.index = 0;
-
-    this.typingInterval = setInterval(() => {
-      if (this.index >= text.length) {
-        clearInterval(this.typingInterval);
-        this.isTyping = false;
-        // remover cursor
+                    if (currentChar === '\n') {
+                        typingArea.innerHTML += '<br>';
+                    } else {
+                        typingArea.innerHTML += currentChar;
+                    }
+                    
+                    index++;
+                    
+                    typingArea.innerHTML += cursorSpan;
+                    typingArea.scrollTop = typingArea.scrollHeight;
+                    
+                } else {
+                    clearInterval(typeInterval);
+                    setTimeout(() => {
+                        const cursor = typingArea.querySelector('.cursor');
+                        if (cursor) cursor.remove();
+                    }, 2000);
+                }
+            }, typingSpeed);
+        }
+        
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+        
         setTimeout(() => {
-          const c = this.typingArea.querySelector('.cursor');
-          if (c) c.remove();
-        }, 800);
-        // esconder skip
-        this.skipButton.style.display = 'none';
-        return;
-      }
-
-      const ch = text[this.index];
-      if (ch === '\n') {
-        this.typingArea.innerHTML += '<br>';
-      } else {
-        const safe = ch.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        this.typingArea.innerHTML += safe;
-      }
-      this.index++;
-
-      // cursor management: keep only last cursor
-      const cursors = this.typingArea.querySelectorAll('.cursor');
-      cursors.forEach((el, i) => { if (i < cursors.length - 1) el.remove(); });
-      this.typingArea.innerHTML += '<span class="cursor">|</span>';
-
-      // autoscroll
-      this.typingArea.scrollTop = this.typingArea.scrollHeight;
-
-    }, msPerChar);
-  }
-
-  finishTypingImmediately() {
-    if (!this.isTyping) return;
-    // stop interval
-    clearInterval(this.typingInterval);
-    // write remaining text quickly
-    const remaining = this.letterText.slice(this.index);
-    const safe = remaining.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-    // remove trailing cursor(s)
-    const cursors = this.typingArea.querySelectorAll('.cursor');
-    cursors.forEach(c => c.remove());
-    this.typingArea.innerHTML += safe;
-    // remove cursor and finalize
-    const finalCursor = this.typingArea.querySelector('.cursor');
-    if (finalCursor) finalCursor.remove();
-    this.isTyping = false;
-    this.skipButton.style.display = 'none';
-    // ensure music is playing or left as is (do not stop by default)
-  }
-}
-
-function goBack(){ window.location.href = 'index.html'; }
-
-// inicializa quando DOM pronto
-document.addEventListener('DOMContentLoaded', () => {
-  // instancia globalmente para debugging se quiser (não necessário)
-  window.letterReaderInstance = new LetterReader();
-
-  // expõe atalho global caso algum onclick ainda chame startReading()
-  window.startReading = () => { if (window.letterReaderInstance) window.letterReaderInstance.startReading(); };
-});
-</script>
+            document.getElementById('thoughtBubble').style.display = 'none';
+            document.getElementById('readButton').style.display = 'block';
+        }, 3000);
+        
+        document.addEventListener('touchmove', function(e) {
+            if (e.scale !== 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
 </body>
 </html>
